@@ -1,16 +1,14 @@
 {
-    "builds": [
-      { "src": "yoga_pose_app.py", "use": "@vercel/python" }
-    ],
-    "routes": [
-      { "src": "/", "dest": "yoga_pose_app.py" }
-    ],
-    "env": {
-      "PYTHON_VERSION": "3.11.1"
-    },
-    "install": {
-      "include": ["requirements.txt"],
-      "command": "pip install -r requirements.txt"
-    }
-  }
-  
+	"builds":[
+		{
+			"src":"app.py",
+			"use":"@vercel/python"
+		}
+	],
+	"routes":[
+		{
+			"src":"/(.*)",
+			"dest":"app.py"
+		}
+	]
+}
