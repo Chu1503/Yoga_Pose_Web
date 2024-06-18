@@ -39,12 +39,12 @@ def pose_detector(pose_name):
     args = get_args()
 
     cap_device = args.device
-    cap_width = args.width
-    cap_height = args.height
 
+    # cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     cap = cv2.VideoCapture(cap_device)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, cap_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cap_height)
+    print("camera opened")
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     if not cap.isOpened():
         st.error("Error: Webcam could not be opened.")
