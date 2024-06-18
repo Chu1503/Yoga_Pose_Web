@@ -3,9 +3,21 @@ import mediapipe as mp
 import numpy as np
 import streamlit as st
 import time
+import argparse
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
+
+def get_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--device", type=int, default=0)
+    parser.add_argument("--width", help='cap width', type=int, default=1280)
+    parser.add_argument("--height", help='cap height', type=int, default=720)
+
+    args = parser.parse_args()
+
+    return args
 
 def calculate_angle(a, b, c):
     a = np.array(a)
@@ -24,10 +36,15 @@ def pose_detector(pose_name):
     prev_time = 0
     fps = 0
 
-    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-    print("camera opened")
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    args = get_args()
+
+    cap_device = args.device
+    cap_width = args.width
+    cap_height = args.height
+
+    cap = cv2.VideoCapture(cap_device)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, cap_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cap_height)
 
     if not cap.isOpened():
         st.error("Error: Webcam could not be opened.")
