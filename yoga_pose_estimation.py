@@ -25,6 +25,7 @@ def pose_detector(pose_name):
     fps = 0
 
     cap = cv2.VideoCapture(0)
+    print("camera opened")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
@@ -33,7 +34,8 @@ def pose_detector(pose_name):
         return
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-        elbow_range = (0, 0)
+        left_elbow_range = (0, 0)
+        right_elbow_range = (0, 0)
         left_elbow_angle = 0
         right_elbow_angle = 0
         left_knee_angle = 0
@@ -92,14 +94,16 @@ def pose_detector(pose_name):
                     left_knee_accuracy = 100 - abs(170 - left_knee_angle)
                     right_knee_accuracy = 100 - abs(170 - right_knee_angle)  # Different accuracy calculation for Warrior Pose
                     overall_accuracy = (right_elbow_accuracy + left_elbow_accuracy + left_knee_accuracy + right_knee_accuracy) / 4
-                    elbow_range = (160, 180)  # Angle range for rendering
+                    left_elbow_range = (160, 180)
+                    right_elbow_range = (160, 180)
                 elif pose_name == "Plank Pose":
                     left_elbow_accuracy = 100 - abs(170 - left_elbow_angle)
                     right_elbow_accuracy = 100 - abs(170 - right_elbow_angle)
                     left_knee_accuracy = 100 - abs(180 - left_knee_angle)
                     right_knee_accuracy = 100 - abs(180 - right_knee_angle)  # Different accuracy calculation for Plank Pose
                     overall_accuracy = (right_elbow_accuracy + left_elbow_accuracy + left_knee_accuracy + right_knee_accuracy) / 4
-                    elbow_range = (50, 80)  # Angle range for rendering
+                    left_elbow_range = (160, 180)
+                    right_elbow_range = (160, 180)
 
                 # Visualize angle
                 font_scale = 1.0
@@ -139,15 +143,15 @@ def pose_detector(pose_name):
                 pass
 
             # Render detections based on pose and angle range
-            if elbow_range[0] < left_elbow_angle < elbow_range[1]:
+            if left_elbow_range[0] < left_elbow_angle < left_elbow_range[1] and right_elbow_range[0] < right_elbow_angle < right_elbow_range[1]:
                 mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
                                     mp_drawing.DrawingSpec(color=(0,0,0), thickness=2, circle_radius=2), 
-                                    mp_drawing.DrawingSpec(color=(0,255,255), thickness=2, circle_radius=2) 
+                                    mp_drawing.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=2) 
                                     )
             else:
                 mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
                                     mp_drawing.DrawingSpec(color=(0,0,0), thickness=2, circle_radius=2),
-                                    mp_drawing.DrawingSpec(color=(255,0,255), thickness=2, circle_radius=2) 
+                                    mp_drawing.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2) 
                                     )
 
             # Calculate and display FPS
@@ -158,10 +162,6 @@ def pose_detector(pose_name):
 
             cv2.putText(image, f'FPS: {int(fps)}', (10, 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-
-            # mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-            #                           mp_drawing.DrawingSpec(color=(0, 0, 0), thickness=2, circle_radius=2),
-            #                           mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=2, circle_radius=2))
 
             ret, buffer = cv2.imencode('.jpg', image)
             frame = buffer.tobytes()
